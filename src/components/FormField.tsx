@@ -1,4 +1,4 @@
-import { type IFormField } from "../core/interfaces/IFormField"
+import { type IFormField } from "../core/interfaces/IFormField";
 import styles from "../styles/form.module.css";
 
 export default function FormField({
@@ -24,4 +24,3 @@ export default function FormField({
     </div>
   );
 }
-
