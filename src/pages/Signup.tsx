@@ -65,7 +65,7 @@ export default function Login() {
             error={errors.confirmPassword}
         />
 
-        <button type="submit">Login</button>
+        <button type="submit">Signup</button>
 
     </form>
     </div>
