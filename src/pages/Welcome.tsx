@@ -1,5 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { motion, useMotionValue, useTransform } from "framer-motion";
+import type { MouseEvent } from "react";
+import AnimatedBackground from "../components/Layout/AnimatedBackground";
+
 
 export default function Welcome() {
   const navigate = useNavigate();
@@ -10,7 +13,9 @@ export default function Welcome() {
   const rotateX = useTransform(mouseY, [-300, 300], [8, -8]);
   const rotateY = useTransform(mouseX, [-300, 300], [-8, 8]);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const handleMouseMove = (
+    e: MouseEvent<HTMLDivElement>
+  ) => {
     const rect = e.currentTarget.getBoundingClientRect();
 
     mouseX.set(e.clientX - rect.left - rect.width / 2);
@@ -22,44 +27,8 @@ export default function Welcome() {
       onMouseMove={handleMouseMove}
       className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#FFF8EA]"
     >
-      {/* Background Glow */}
-      <motion.div
-        animate={{
-          x: [0, 60, -20, 0],
-          y: [0, -40, 30, 0],
-        }}
-        transition={{
-          duration: 18,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        className="absolute -left-40 top-20 h-96 w-96 rounded-full bg-[#C47A2C]/10 blur-[140px]"
-      />
+      <AnimatedBackground />
 
-      <motion.div
-        animate={{
-          x: [0, -70, 30, 0],
-          y: [0, 50, -20, 0],
-        }}
-        transition={{
-          duration: 22,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        className="absolute -right-32 bottom-10 h-128 w-lg rounded-full bg-[#8B5A3C]/10 blur-[170px]"
-      />
-
-      <motion.div
-        animate={{
-          scale: [1, 1.15, 1],
-        }}
-        transition={{
-          duration: 12,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        className="absolute left-1/2 top-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#E59B1E]/5 blur-[120px]"
-      />
       {/* Huge Watermark */}
       <motion.h1
         style={{
@@ -93,14 +62,7 @@ export default function Welcome() {
 
         {/* Heading */}
         <motion.h1
-          className="
-    mt-4
-    text-[4.5rem]
-    md:text-[6rem]
-    font-normal
-    leading-[0.95]
-    tracking-tight
-    text-[#3A2419]"
+          className="mt-4 text-[4.5rem] font-normal leading-[0.95] tracking-tight text-[#3A2419] md:text-[6rem]"
           style={{
             fontFamily: "Cormorant Garamond, serif",
             textShadow: "0 8px 25px rgba(139,90,60,.06)",
@@ -113,22 +75,15 @@ export default function Welcome() {
 
         {/* Description */}
         <motion.p
-          className="
-    mt-10
-    max-w-md
-    text-[18px]
-    leading-9
-    font-light
-    text-[#4D352B]/80
-  "
+          className="mt-10 max-w-md text-[18px] leading-9 font-light text-[#4D352B]/80"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{
             delay: 0.7,
           }}
         >
-          A curated collection of recipes crafted for people who enjoy cooking,
-          exploring flavors, and creating memorable meals.
+          A curated collection of recipes crafted for people who enjoy
+          cooking, exploring flavors, and creating memorable meals.
         </motion.p>
 
         {/* Button */}
@@ -183,6 +138,8 @@ hover:shadow-[0_0_45px_rgba(229,155,30,0.45)]
 
           <div className="h-10 w-px bg-[#8B5A3C]/30" />
         </div>
+
+        {/* Decorative SVG */}
         <div className="absolute -z-10 opacity-[0.06]">
           <svg
             width="260"
