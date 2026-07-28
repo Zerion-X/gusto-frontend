@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 
 export default function AnimatedBackground() {
   return (
-    <>
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
       <motion.div
         animate={{
           x: [0, 60, -20, 0],
@@ -40,6 +40,6 @@ export default function AnimatedBackground() {
         }}
         className="absolute left-1/2 top-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#E59B1E]/5 blur-[120px]"
       />
-    </>
+    </div>
   );
 }

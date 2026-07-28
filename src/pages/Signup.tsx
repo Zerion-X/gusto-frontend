@@ -54,7 +54,7 @@ export default function Signup() {
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#FFF8EA] px-6">
       <AnimatedBackground />
-            <GlassCard>
+      <GlassCard>
         <AuthHeader
           title="Create"
           highlight="Account"
