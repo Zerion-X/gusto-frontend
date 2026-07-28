@@ -1,14 +1,14 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Link } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
 import { signupSchema } from "../validation/Validation";
-
+import FormField from "../components/FormField";
 import AnimatedBackground from "../components/Layout/AnimatedBackground";
 import GlassCard from "../components/ui/GlassCard";
 import AuthHeader from "../components/ui/AuthHeader";
 import PrimaryButton from "../components/ui/PrimaryButton";
-import FormField from "../components/FormField";
+
+import { addUser, emailExists, usernameExists } from "../utils/userStorage";
 
 type SignupFormData = {
   email: string;
@@ -21,20 +21,40 @@ export default function Signup() {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<SignupFormData>({
     resolver: yupResolver(signupSchema),
   });
 
+  const navigate = useNavigate();
+
   const onSubmit = (data: SignupFormData) => {
-    console.log(data);
+    if (emailExists(data.email)) {
+      setError("email", {
+        type: "manual",
+        message: "This email is already registered.",
+      });
+      return;
+    }
+
+    if (usernameExists(data.username)) {
+      setError("username", {
+        type: "manual",
+        message: "This username is already registered.",
+      });
+      return;
+    }
+
+    addUser(data.username, data.email, data.password);
+
+    navigate("/login");
   };
 
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#FFF8EA]">
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#FFF8EA] px-6">
       <AnimatedBackground />
-
-      <GlassCard>
+            <GlassCard>
         <AuthHeader
           title="Create"
           highlight="Account"

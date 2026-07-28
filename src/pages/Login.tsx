@@ -1,14 +1,14 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { loginSchema } from "../validation/Validation";
-
+import FormField from "../components/FormField";
 import AnimatedBackground from "../components/Layout/AnimatedBackground";
 import GlassCard from "../components/ui/GlassCard";
 import AuthHeader from "../components/ui/AuthHeader";
 import PrimaryButton from "../components/ui/PrimaryButton";
-import FormField from "../components/FormField";
+import { loginUser } from "../utils/userStorage";
 
 type LoginFormData = {
   email_username: string;
@@ -19,19 +19,32 @@ export default function Login() {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: yupResolver(loginSchema),
   });
 
+  const navigate = useNavigate();
+
   const onSubmit = (data: LoginFormData) => {
-    console.log(data);
+    const user = loginUser(data.email_username, data.password);
+
+    if (!user) {
+      setError("email_username", {
+        type: "manual",
+        message: "Invalid username/email or password.",
+      });
+      return;
+    }
+    navigate("/home");
   };
 
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#FFF8EA]">
-      <AnimatedBackground />
-
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#FFF8EA] px-6">
+    
+    <AnimatedBackground />
+      
       <GlassCard>
         <AuthHeader
           title="Welcome"
