@@ -1,4 +1,5 @@
 import { type IFormField } from "../core/interfaces/IFormField";
+import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 
 export default function FormField({
@@ -28,7 +29,19 @@ export default function FormField({
             : "border-[#C47A2C]/20 focus:border-[#C47A2C] focus:ring-4 focus:ring-[#E59B1E]/20"
         }`}
       />
-      
+      {type === "password" && (
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8B5A3C] transition-colors duration-300 hover:text-[#C47A2C]"
+        >
+          {showPassword ? (
+            <EyeOff size={20} strokeWidth={2} />
+          ) : (
+            <Eye size={20} strokeWidth={2} />
+          )}
+        </button>
+      )}
 
       {error && <p className="mt-1 text-sm text-red-500">{error.message}</p>}
     </div>
