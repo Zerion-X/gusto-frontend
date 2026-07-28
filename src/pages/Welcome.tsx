@@ -113,6 +113,14 @@ export default function Welcome() {
 
         {/* Description */}
         <motion.p
+          className="
+    mt-10
+    max-w-md
+    text-[18px]
+    leading-9
+    font-light
+    text-[#4D352B]/80
+  "
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{
