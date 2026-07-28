@@ -1,9 +1,11 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { signupSchema } from "../validation/Validation";
 import FormField from "../components/FormField";
+
+import { addUser, emailExists, usernameExists } from "../utils/userStorage";
 
 type SignupFormData = {
   email: string;
@@ -16,18 +18,38 @@ export default function Signup() {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<SignupFormData>({
     resolver: yupResolver(signupSchema),
   });
 
+  const navigate = useNavigate();
+
   const onSubmit = (data: SignupFormData) => {
-    console.log(data);
+    if (emailExists(data.email)) {
+      setError("email", {
+        type: "manual",
+        message: "This email is already registered.",
+      });
+      return;
+    }
+
+    if (usernameExists(data.username)) {
+      setError("username", {
+        type: "manual",
+        message: "This username is already registered.",
+      });
+      return;
+    }
+
+    addUser(data.username, data.email, data.password);
+
+    navigate("/login");
   };
 
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#FFF8EA] px-6">
-
       {/* Background Glow */}
       <motion.div
         animate={{
@@ -75,7 +97,6 @@ export default function Signup() {
         className="relative z-10 w-full max-w-md rounded-[32px] border border-white/40 bg-white/30 p-10 shadow-2xl backdrop-blur-xl"
       >
         <div className="mb-8 text-center">
-
           <span className="text-sm uppercase tracking-[0.6em] text-[#8B5A3C]">
             GUSTO
           </span>
@@ -94,10 +115,7 @@ export default function Signup() {
           </p>
         </div>
 
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="space-y-5"
-        >
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <FormField
             label="Email"
             name="email"
@@ -163,9 +181,7 @@ export default function Signup() {
 
             <div className="absolute -left-full top-0 h-full w-full bg-white/20 transition-all duration-700 group-hover:left-full" />
 
-            <span className="relative z-10">
-              Create Account
-            </span>
+            <span className="relative z-10">Create Account</span>
           </motion.button>
         </form>
 

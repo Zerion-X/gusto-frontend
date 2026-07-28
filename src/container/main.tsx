@@ -6,6 +6,10 @@ import App from "../app/App.tsx";
 import "@fontsource/inter";
 import "@fontsource/cormorant-garamond";
 
+import { initializeUsers } from "../utils/userStorage.ts";
+
+initializeUsers();
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <App />

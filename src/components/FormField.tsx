@@ -1,4 +1,5 @@
 import { type IFormField } from "../core/interfaces/IFormField";
+import { useState } from "react";
 
 export default function FormField({
   label,
@@ -8,18 +9,17 @@ export default function FormField({
   register,
   error,
 }: IFormField) {
+  const [showPassword, setShowPassword] = useState(false);
+
   return (
     <div className="flex flex-col gap-2">
-      <label
-        htmlFor={name}
-        className="text-sm font-medium text-[#8B5A3C]"
-      >
+      <label htmlFor={name} className="text-sm font-medium text-[#8B5A3C]">
         {label}
       </label>
 
       <input
         id={name}
-        type={type}
+        type={type === "password" ? (showPassword ? "text" : "password") : type}
         placeholder={placeholder}
         {...register(name)}
         className={`w-full rounded-xl border bg-white/60 px-4 py-3 text-[#3A2419] placeholder:text-[#8B5A3C]/50 backdrop-blur-md outline-none transition-all duration-300 ${
@@ -28,12 +28,9 @@ export default function FormField({
             : "border-[#C47A2C]/20 focus:border-[#C47A2C] focus:ring-4 focus:ring-[#E59B1E]/20"
         }`}
       />
+      
 
-      {error && (
-        <p className="mt-1 text-sm text-red-500">
-          {error.message}
-        </p>
-      )}
+      {error && <p className="mt-1 text-sm text-red-500">{error.message}</p>}
     </div>
   );
 }
