@@ -3,13 +3,10 @@ import ProfileHeader from "../components/Profile/ProfileHeader";
 import ProfileStat from "../components/Profile/ProfileStats";
 import PostCard from "../components/Profile/ProfilePostCard";
 import { type Post } from "../core/interfaces/Post";
-//import { useParams } from "react-router-dom";
+import { Navigate } from "react-router-dom";
+import { getCurrentUser } from "../utils/userStorage";
 
-const user = {
-  username: "mahan",
-  email: "mahan@gmail.com",
-  joined: "July 2026",
-};
+import { useParams } from "react-router-dom";
 
 const posts: Post[] = [
   {
@@ -46,14 +43,25 @@ const stats = [
 ];
 
 export default function UserManagement() {
+  const currentUser = getCurrentUser();
+  const { username } = useParams();
+
+  if (!currentUser) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!username || username !== currentUser.username) {
+    return <Navigate to={`/profile/${currentUser.username}`} replace />;
+  }
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#FFF8EA]">
       <AnimatedBackground />
 
       <section className="relative z-10 mx-auto max-w-6xl px-6 py-16">
         <ProfileHeader
-          username={user.username}
-          email={user.email}
+          username={currentUser.username}
+          email={currentUser.email}
         />
 
         <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
@@ -78,10 +86,7 @@ export default function UserManagement() {
 
           <div className="space-y-6">
             {posts.map((post) => (
-              <PostCard
-                key={post.id}
-                {...post}
-              />
+              <PostCard key={post.id} {...post} />
             ))}
           </div>
         </section>

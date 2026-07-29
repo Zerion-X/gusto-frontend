@@ -24,12 +24,8 @@ export default function Footer() {
             Recipes
           </Link>
 
-          <Link
-            to="/profile"
-            className="transition-colors duration-300 hover:text-[#C47A2C]"
-          >
-            Profile
-          </Link>
+          {/* add contact us */}
+
         </div>
       </div>
       <div className="border-t border-[#C47A2C]/10 py-4 text-center text-sm text-[#8B5A3C]/70">

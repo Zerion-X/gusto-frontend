@@ -8,7 +8,8 @@ import AnimatedBackground from "../components/Layout/AnimatedBackground";
 import GlassCard from "../components/ui/GlassCard";
 import AuthHeader from "../components/ui/AuthHeader";
 import PrimaryButton from "../components/ui/PrimaryButton";
-import { loginUser } from "../utils/userStorage";
+import { loginUser, setCurrentUser } from "../utils/userStorage";
+
 
 type LoginFormData = {
   email_username: string;
@@ -37,14 +38,16 @@ export default function Login() {
       });
       return;
     }
+
+    setCurrentUser(user);
+
     navigate("/home");
   };
 
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#FFF8EA] px-6">
-    
-    <AnimatedBackground />
-      
+      <AnimatedBackground />
+
       <GlassCard>
         <AuthHeader
           title="Welcome"
@@ -70,9 +73,7 @@ export default function Login() {
             error={errors.password}
           />
 
-          <PrimaryButton type="submit">
-            Login
-          </PrimaryButton>
+          <PrimaryButton type="submit">Login</PrimaryButton>
         </form>
 
         <p className="mt-8 text-center text-sm text-[#8B5A3C]">

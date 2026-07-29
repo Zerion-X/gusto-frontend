@@ -5,6 +5,7 @@ import Login from "../pages/Login";
 import Signup from "../pages/Signup";
 import Register from "../pages/Register";
 import Home from "../pages/Home";
+import ProtectedRoute from "../components/ProtectedRoute";
 import UserManagement from "../pages/UserManagement";
 import MainLayout from "../components/Layout/MainLayout";
 import AuthLayout from "../components/Layout/AuthLayout";
@@ -25,16 +26,33 @@ const router = createBrowserRouter([
       },
 
       {
-        element: <MainLayout />,
+        element: <ProtectedRoute />,
         children: [
-          { path: "home", element: <Home /> },
-          { path: "profile/:username", element: <UserManagement /> },
-
-          // future pages
-          // { path: "recipes/:id", element: <Recipe /> },
-          // { path: "settings", element: <Settings /> },
+          {
+            element: <MainLayout />,
+            children: [
+              { path: "home", element: <Home /> },
+              { path: "profile/:username", element: <UserManagement /> },
+              // future pages
+              // { path: "recipes/:id", element: <Recipe /> },
+              // { path: "settings", element: <Settings /> },
+            ],
+          },
         ],
       },
+
+      // before
+      // {
+      //   element: <MainLayout />,
+      //   children: [
+      //     { path: "home", element: <Home /> },
+      //     { path: "profile/:username", element: <UserManagement /> },
+
+      //     // future pages
+      //     // { path: "recipes/:id", element: <Recipe /> },
+      //     // { path: "settings", element: <Settings /> },
+      //   ],
+      // },
     ],
   },
 ]);
