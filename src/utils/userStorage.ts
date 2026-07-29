@@ -40,7 +40,7 @@ function saveUsers(users: User[]) {
  */
 export function emailExists(email: string): boolean {
   return getUsers().some(
-    (user) => user.email.toLowerCase() === email.toLowerCase()
+    (user) => user.email.toLowerCase() === email.toLowerCase(),
   );
 }
 
@@ -49,18 +49,14 @@ export function emailExists(email: string): boolean {
  */
 export function usernameExists(username: string): boolean {
   return getUsers().some(
-    (user) => user.username.toLowerCase() === username.toLowerCase()
+    (user) => user.username.toLowerCase() === username.toLowerCase(),
   );
 }
 
 /**
  * Adds a new user.
  */
-export function addUser(
-  username: string,
-  email: string,
-  password: string
-) {
+export function addUser(username: string, email: string, password: string) {
   const users = getUsers();
 
   const newUser: User = {
@@ -80,7 +76,7 @@ export function addUser(
  */
 export function loginUser(
   emailOrUsername: string,
-  password: string
+  password: string,
 ): User | null {
   const users = getUsers();
 
@@ -89,7 +85,23 @@ export function loginUser(
       (user) =>
         (user.email.toLowerCase() === emailOrUsername.toLowerCase() ||
           user.username.toLowerCase() === emailOrUsername.toLowerCase()) &&
-        user.password === password
+        user.password === password,
     ) || null
   );
+}
+
+const CURRENT_USER_KEY = "gusto-current-user";
+
+export function setCurrentUser(user: User) {
+  sessionStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+}
+
+export function getCurrentUser(): User | null {
+  const user = sessionStorage.getItem(CURRENT_USER_KEY);
+
+  return user ? JSON.parse(user) : null;
+}
+
+export function logoutUser() {
+  sessionStorage.removeItem(CURRENT_USER_KEY);
 }

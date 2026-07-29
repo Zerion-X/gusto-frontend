@@ -5,9 +5,12 @@ import {
   UserRound,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { getCurrentUser } from "../../utils/userStorage";
 
 export default function Navbar() {
   const navigate = useNavigate();
+
+  // const currentUser = getCurrentUser();
 
   const handleLogoClick = () => {
     navigate("/home");
@@ -94,7 +97,13 @@ export default function Navbar() {
           </button>
 
           <button
-            onClick={() => navigate("/profile")}
+            onClick={() => {
+              const currentUser = getCurrentUser();
+
+              if (currentUser) {
+                navigate(`/profile/${currentUser.username}`);
+              }
+            }}
             className="
               rounded-full
               border
