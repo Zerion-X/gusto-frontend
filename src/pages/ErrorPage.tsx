@@ -2,9 +2,8 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import AnimatedBackground from "../components/Layout/AnimatedBackground";
 
-
 export default function ErrorPage() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#FFF8EA]">
       <AnimatedBackground />
@@ -34,12 +33,12 @@ export default function ErrorPage() {
         </h2>
 
         <p className="mt-6 max-w-lg text-lg leading-8 text-[#4D352B]/80">
-          The recipe you're looking for couldn't be found.
-          It may have been moved, deleted, or the address might be incorrect.
+          The recipe you're looking for couldn't be found. It may have been
+          moved, deleted, or the address might be incorrect.
         </p>
 
         <motion.button
-          onClick={() => navigate("/welcome")}
+          onClick={() => navigate("/home")}
           className="
 group
 relative

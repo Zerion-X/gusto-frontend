@@ -16,18 +16,18 @@ export default function AnimatedBackground() {
         className="absolute -left-40 top-20 h-96 w-96 rounded-full bg-[#C47A2C]/10 blur-[140px]"
       />
 
-      <motion.div
-        animate={{
-          x: [0, -70, 30, 0],
-          y: [0, 50, -20, 0],
-        }}
-        transition={{
-          duration: 22,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        className="absolute -right-32 bottom-10 h-[34rem] w-[34rem] rounded-full bg-[#8B5A3C]/10 blur-[170px]"
-      />
+        <motion.div
+          animate={{
+            x: [0, -70, 30, 0],
+            y: [0, 50, -20, 0],
+          }}
+          transition={{
+            duration: 22,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute -right-32 bottom-10 h-[34rem] w-[34rem] rounded-full bg-[#8B5A3C]/10 blur-[170px]"
+        />
 
       <motion.div
         animate={{
