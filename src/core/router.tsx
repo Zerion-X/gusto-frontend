@@ -1,28 +1,40 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import RootLayout from "../pages/RootLayout";
 import ErrorPage from "../pages/ErrorPage";
-import Register from "../pages/Register";
+import Welcome from "../pages/Welcome";
 import Login from "../pages/Login";
 import Signup from "../pages/Signup";
-import Welcome from "../pages/Welcome";
+import Register from "../pages/Register";
 import Home from "../pages/Home";
 import UserManagement from "../pages/UserManagement";
+import MainLayout from "../components/Layout/MainLayout";
+import AuthLayout from "../components/Layout/AuthLayout";
 
 const router = createBrowserRouter([
   {
-    path: "/",
-    element: <RootLayout />,
     errorElement: <ErrorPage />,
     children: [
-      { index: true, element: <Navigate to="/welcome" /> },
-      { path: "welcome", element: <Welcome /> },
-      { path: "register", element: <Register /> },
-      { path: "login", element: <Login /> },
-      { path: "signup", element: <Signup /> },
-      { path: "home", element: <Home /> },
-      //{ path: "refrigerator", element: <Refrigerator />},
-      //{ path: "foodList", element: <FoodList />},
-      { path: "profile/:username", element: <UserManagement />},
+      {
+        element: <AuthLayout />,
+        children: [
+          { index: true, element: <Navigate to="/welcome" replace /> },
+          { path: "welcome", element: <Welcome /> },
+          { path: "login", element: <Login /> },
+          { path: "signup", element: <Signup /> },
+          { path: "register", element: <Register /> },
+        ],
+      },
+
+      {
+        element: <MainLayout />,
+        children: [
+          { path: "home", element: <Home /> },
+          { path: "profile/:username", element: <UserManagement /> },
+
+          // future pages
+          // { path: "recipes/:id", element: <Recipe /> },
+          // { path: "settings", element: <Settings /> },
+        ],
+      },
     ],
   },
 ]);

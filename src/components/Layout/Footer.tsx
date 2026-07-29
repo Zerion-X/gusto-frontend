@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { Mail } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -19,7 +18,7 @@ export default function Footer() {
         {/* Navigation */}
         <div className="flex items-center gap-8 text-sm text-[#6D4C41]">
           <Link
-            to="/recipes"
+            to="/home"
             className="transition-colors duration-300 hover:text-[#C47A2C]"
           >
             Recipes
