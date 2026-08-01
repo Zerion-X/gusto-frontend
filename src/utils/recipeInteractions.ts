@@ -111,14 +111,6 @@ export function getSavedRecipeIds() {
   return getSavedItemIds("recipe");
 }
 
-export function getLikedPostIds() {
-  return getLikedItemIds("post");
-}
-
-export function getSavedPostIds() {
-  return getSavedItemIds("post");
-}
-
 export function toggleItemLike(target: InteractionTarget, itemId: number) {
   const interactions = readInteractions();
   const itemKey = getItemKey(target, itemId);

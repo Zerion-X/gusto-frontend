@@ -38,11 +38,9 @@ export default function RecipeCard({
   const [likeCount, setLikeCount] = useState(likes);
 
   useEffect(() => {
-    setLikeCount(likes);
-    setSaveCount(saves);
     setIsLiked(isItemLiked(kind, id));
     setIsSaved(isItemSaved(kind, id));
-  }, [id, kind, likes, saves]);
+  }, [id, kind]);
 
   function handleSave(e: React.MouseEvent) {
     e.stopPropagation();

@@ -6,9 +6,7 @@ import PostCard from "../components/Profile/ProfilePostCard";
 import { Navigate, useParams } from "react-router-dom";
 import { getCurrentUser } from "../utils/userStorage";
 import {
-  getLikedPostIds,
   getLikedRecipeIds,
-  getSavedPostIds,
   getSavedRecipeIds,
 } from "../utils/recipeInteractions";
 import { getPostsByUser } from "../utils/postStorage";
@@ -16,44 +14,31 @@ import { getPostsByUser } from "../utils/postStorage";
 export default function UserManagement() {
   const currentUser = getCurrentUser();
   const { username } = useParams();
-  const [likedCount, setLikedCount] = useState(
-    getLikedRecipeIds().length + getLikedPostIds().length,
-  );
-  const [savedCount, setSavedCount] = useState(
-    getSavedRecipeIds().length + getSavedPostIds().length,
-  );
-  const [posts, setPosts] = useState(() =>
-    currentUser ? getPostsByUser(currentUser.username) : [],
-  );
+  const [likedCount, setLikedCount] = useState(getLikedRecipeIds().length);
+  const [savedCount, setSavedCount] = useState(getSavedRecipeIds().length);
+  const userPosts = currentUser ? getPostsByUser(currentUser.username) : [];
 
   useEffect(() => {
     const syncCounts = () => {
-      setLikedCount(getLikedRecipeIds().length + getLikedPostIds().length);
-      setSavedCount(getSavedRecipeIds().length + getSavedPostIds().length);
-    };
-
-    const syncPosts = () => {
-      setPosts(currentUser ? getPostsByUser(currentUser.username) : []);
+      setLikedCount(getLikedRecipeIds().length);
+      setSavedCount(getSavedRecipeIds().length);
     };
 
     syncCounts();
-    syncPosts();
     window.addEventListener("gusto-recipe-interactions-changed", syncCounts);
-    window.addEventListener("gusto-posts-changed", syncPosts);
 
     return () => {
       window.removeEventListener(
         "gusto-recipe-interactions-changed",
         syncCounts,
       );
-      window.removeEventListener("gusto-posts-changed", syncPosts);
     };
-  }, [currentUser]);
+  }, []);
 
   const stats = [
     {
       title: "Posts",
-      value: posts.length,
+      value: userPosts.length,
       route: undefined,
     },
     {
@@ -108,12 +93,12 @@ export default function UserManagement() {
           </h2>
 
           <div className="space-y-6">
-            {posts.length === 0 ? (
+            {userPosts.length === 0 ? (
               <div className="rounded-3xl border border-white/40 bg-white/30 p-6 text-[#8B5A3C] shadow-xl backdrop-blur-xl">
                 You have not posted anything yet.
               </div>
             ) : (
-              posts.map((post) => (
+              userPosts.map((post) => (
                 <PostCard
                   key={post.id}
                   title={post.title}
