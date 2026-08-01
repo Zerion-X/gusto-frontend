@@ -1,7 +1,9 @@
 import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import AnimatedBackground from "../components/Layout/AnimatedBackground";
-import RecipeCard, { type RecipeCardProps } from "../components/Recipe/RecipeCard";
+import RecipeCard, {
+  type RecipeCardProps,
+} from "../components/Recipe/RecipeCard";
 import { recipes as defaultRecipes } from "../data/recipes";
 import { getPosts } from "../utils/postStorage";
 
@@ -46,7 +48,6 @@ export default function SearchResults() {
       <AnimatedBackground />
 
       <main className="relative z-10 mx-auto max-w-7xl px-8 py-12">
-
         {query ? (
           filteredRecipes.length > 0 ? (
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
@@ -60,7 +61,8 @@ export default function SearchResults() {
                 No recipes found
               </p>
               <p className="mt-3 text-[#6D4C41]/90">
-                Try a different keyword or broaden your search to find recipes that match.
+                Try a different keyword or broaden your search to find recipes
+                that match.
               </p>
             </div>
           )
@@ -70,7 +72,8 @@ export default function SearchResults() {
               Ready to search?
             </p>
             <p className="mt-3 text-[#6D4C41]/90">
-              Use the search bar above to explore recipes, ingredients, and cuisine ideas.
+              Use the search bar above to explore recipes, ingredients, and
+              cuisine ideas.
             </p>
           </div>
         )}
