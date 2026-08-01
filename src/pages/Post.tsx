@@ -1,52 +1,82 @@
 import ImageUploadBox from "../components/AddImage";
-import { useState, type FormEvent } from "react";
+import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
+import { addPost } from "../utils/postStorage";
 
 export default function AddPost() {
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const navigate = useNavigate();
+  const [image, setImage] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [steps, setSteps] = useState("");
+  const [stepCount, setStepCount] = useState(1);
+  const [steps, setSteps] = useState<string[]>([""]);
   const [statusMessage, setStatusMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleStepChange = (index: number, value: string) => {
+    const updatedSteps = [...steps];
+    updatedSteps[index] = value;
+    setSteps(updatedSteps);
+  };
+
+  const handleStepCountChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const count = Number(e.target.value);
+
+    setStepCount(count);
+
+    setSteps((prev) => {
+      const updated = [...prev];
+      if (count > updated.length) {
+        while (updated.length < count) {
+          updated.push("");
+        }
+      } else {
+        updated.length = count;
+      }
+      return updated;
+    });
+  };
+
+  const resetForm = () => {
+    setTitle("");
+    setDescription("");
+    setStepCount(1);
+    setSteps([""]);
+    setImage("");
+  };
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!title.trim() || !description.trim() || !steps.trim() || !imageFile) {
-      setStatusMessage("Please fill in the title, description, steps, and add an image.");
+    if (
+      !title.trim() ||
+      !description.trim() ||
+      steps.some((step) => !step.trim()) ||
+      !image
+    ) {
+      setStatusMessage("Please complete all recipe steps and add an image.");
       return;
     }
 
     setIsSubmitting(true);
     setStatusMessage("");
 
-    try {
-      const formData = new FormData();
-      formData.append("title", title.trim());
-      formData.append("description", description.trim());
-      formData.append("steps", steps.trim());
-      formData.append("image", imageFile);
+    const createdPost = addPost({
+      title: title.trim(),
+      description: description.trim(),
+      steps: steps.map((step) => step.trim()),
+      image,
+    });
 
-      const response = await fetch("http://localhost:4200/api/posts", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Unable to publish post.");
-      }
-
+    if (createdPost) {
+      resetForm();
       setStatusMessage("Post published successfully!");
-      setTitle("");
-      setDescription("");
-      setSteps("");
-      setImageFile(null);
-    } catch (error) {
-      console.error(error);
-      setStatusMessage("Something went wrong while publishing your post.");
-    } finally {
-      setIsSubmitting(false);
+      navigate(`/recipes/${createdPost.id}?type=post`);
+    } else {
+      setStatusMessage("Please sign in before publishing a post.");
     }
+
+    setIsSubmitting(false);
   };
 
   return (
@@ -62,11 +92,12 @@ export default function AddPost() {
                 Share your next favorite recipe
               </h2>
               <p className="mt-3 max-w-xl text-base leading-7 text-[#6D4C41]/90">
-                Add a warm, appetizing image and describe the dish in a way that feels polished and inviting.
+                Add a warm, appetizing image and describe the dish in a way that
+                feels polished and inviting.
               </p>
             </div>
 
-            <ImageUploadBox onImageSelect={(file) => setImageFile(file)} />
+            <ImageUploadBox image={image} onImageSelect={setImage} />
           </div>
 
           <div className="flex flex-col justify-center rounded-[30px] border border-[#C47A2C]/15 bg-white/70 p-6 shadow-sm sm:p-8">
@@ -101,19 +132,43 @@ export default function AddPost() {
                 />
               </div>
 
-              <div>
-                <label className="mb-2 block text-sm font-semibold uppercase tracking-[0.2em] text-[#8B5A3C]">
-                  Steps
+              <div className="space-y-4">
+                <label className="block text-sm font-semibold uppercase tracking-[0.2em] text-[#8B5A3C]">
+                  Recipe Steps
                 </label>
-                <textarea
-                  name="steps"
-                  rows={15}
-                  value={steps}
-                  onChange={(e) => setSteps(e.target.value)}
-                  placeholder="Walk us through the steps of preparing your dish…"
-                  required
-                  className="w-full resize-none rounded-[20px] border border-[#C47A2C]/20 bg-white/60 px-4 py-3 text-[#3A2419] placeholder:text-[#8B5A3C]/50 outline-none transition-all duration-300 focus:border-[#C47A2C] focus:ring-4 focus:ring-[#E59B1E]/20"
-                />
+
+                <select
+                  value={stepCount}
+                  onChange={handleStepCountChange}
+                  className="w-full rounded-full border border-[#C47A2C]/20 bg-white/60 px-4 py-3 text-[#3A2419] outline-none transition-all duration-300 focus:border-[#C47A2C] focus:ring-4 focus:ring-[#E59B1E]/20"
+                >
+                  {Array.from({ length: 10 }, (_, i) => (
+                    <option key={i + 1} value={i + 1}>
+                      {i + 1} Step{i > 0 ? "s" : ""}
+                    </option>
+                  ))}
+                </select>
+
+                <div className="space-y-4">
+                  {steps.map((step, index) => (
+                    <div key={index}>
+                      <label className="mb-2 block text-sm font-medium text-[#8B5A3C]">
+                        Step {index + 1}
+                      </label>
+
+                      <textarea
+                        value={step}
+                        onChange={(e) =>
+                          handleStepChange(index, e.target.value)
+                        }
+                        rows={3}
+                        placeholder={`Describe step ${index + 1}...`}
+                        required
+                        className="w-full resize-none rounded-[20px] border border-[#C47A2C]/20 bg-white/60 px-4 py-3 text-[#3A2419] placeholder:text-[#8B5A3C]/50 outline-none transition-all duration-300 focus:border-[#C47A2C] focus:ring-4 focus:ring-[#E59B1E]/20"
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {statusMessage ? (

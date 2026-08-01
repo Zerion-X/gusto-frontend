@@ -3,7 +3,6 @@ import ErrorPage from "../pages/ErrorPage";
 import Welcome from "../pages/Welcome";
 import Login from "../pages/Login";
 import Signup from "../pages/Signup";
-import Register from "../pages/Register";
 import Home from "../pages/Home";
 import SearchResults from "../pages/SearchResults";
 import ProtectedRoute from "../components/ProtectedRoute";
@@ -25,10 +24,9 @@ const router = createBrowserRouter([
           { path: "welcome", element: <Welcome /> },
           { path: "login", element: <Login /> },
           { path: "signup", element: <Signup /> },
-          { path: "register", element: <Register /> },
         ],
       },
-
+ 
       {
         element: <ProtectedRoute />,
         children: [
@@ -47,7 +45,7 @@ const router = createBrowserRouter([
               },
               { path: "profile/:username", element: <UserManagement /> },
               { path: "recipes/:id", element: <RecipePage /> },
-              { path: "createpost", element: <AddPost />}
+              { path: "/createpost", element: <AddPost /> },
               // { path: "settings", element: <Settings /> },
             ],
           },

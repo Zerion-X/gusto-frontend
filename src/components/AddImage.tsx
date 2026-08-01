@@ -1,9 +1,16 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { ImagePlus } from "lucide-react";
 
-export default function ImageUploadBox({ onImageSelect }: { onImageSelect: (file: File) => void }) {
+type ImageUploadBoxProps = {
+  image: string;
+  onImageSelect: (image: string) => void;
+};
+
+export default function ImageUploadBox({
+  image,
+  onImageSelect,
+}: ImageUploadBoxProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
 
   const handleClick = () => {
     fileInputRef.current?.click();
@@ -11,12 +18,16 @@ export default function ImageUploadBox({ onImageSelect }: { onImageSelect: (file
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+
     if (!file) return;
 
-    onImageSelect(file);
+    const reader = new FileReader();
 
-    const url = URL.createObjectURL(file);
-    setPreview(url);
+    reader.onloadend = () => {
+      onImageSelect(reader.result as string);
+    };
+
+    reader.readAsDataURL(file);
   };
 
   return (
@@ -33,10 +44,10 @@ export default function ImageUploadBox({ onImageSelect }: { onImageSelect: (file
         onClick={handleClick}
         className="group relative flex h-[620px] w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-[28px] border border-dashed border-[#C47A2C]/40 bg-gradient-to-br from-[#FFF8EA] to-white p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:border-[#C47A2C] hover:shadow-xl"
       >
-        {preview ? (
+        {image ? (
           <>
             <img
-              src={preview}
+              src={image}
               alt="preview"
               className="h-full w-full rounded-[24px] object-cover"
             />
