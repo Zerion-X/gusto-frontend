@@ -5,10 +5,7 @@ type ProfileStatProps = {
   value: number;
 };
 
-export default function ProfileStat({
-  title,
-  value,
-}: ProfileStatProps) {
+export default function ProfileStat({ title, value }: ProfileStatProps) {
   return (
     <motion.div
       whileHover={{
@@ -29,13 +26,9 @@ export default function ProfileStat({
         backdrop-blur-xl
       "
     >
-      <h2 className="text-4xl font-bold text-[#C47A2C]">
-        {value}
-      </h2>
+      <h2 className="text-4xl font-bold text-[#C47A2C]">{value}</h2>
 
-      <p className="mt-2 text-[#8B5A3C]">
-        {title}
-      </p>
+      <p className="mt-2 text-[#8B5A3C]">{title}</p>
     </motion.div>
   );
 }
