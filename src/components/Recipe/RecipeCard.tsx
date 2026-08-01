@@ -1,7 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Heart, Bookmark } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import {
+  isRecipeLiked,
+  isRecipeSaved,
+  toggleRecipeLike,
+  toggleRecipeSave,
+} from "../../utils/recipeInteractions";
 
 export type RecipeCardProps = {
   id: number;
@@ -28,28 +34,25 @@ export default function RecipeCard({
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(likes);
 
+  useEffect(() => {
+    setIsLiked(isRecipeLiked(id));
+    setIsSaved(isRecipeSaved(id));
+  }, [id]);
+
   function handleSave(e: React.MouseEvent) {
     e.stopPropagation();
 
-    if (isSaved) {
-      setSaveCount((count) => count - 1);
-    } else {
-      setSaveCount((count) => count + 1);
-    }
-
-    setIsSaved((prev) => !prev);
+    const nextSaved = toggleRecipeSave(id);
+    setIsSaved(nextSaved);
+    setSaveCount((count) => (nextSaved ? count + 1 : count - 1));
   }
 
   function handleLike(e: React.MouseEvent) {
     e.stopPropagation();
 
-    if (isLiked) {
-      setLikeCount((count) => count - 1);
-    } else {
-      setLikeCount((count) => count + 1);
-    }
-
-    setIsLiked((prev) => !prev);
+    const nextLiked = toggleRecipeLike(id);
+    setIsLiked(nextLiked);
+    setLikeCount((count) => (nextLiked ? count + 1 : count - 1));
   }
 
   return (
@@ -76,7 +79,7 @@ export default function RecipeCard({
         />
 
         {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/55 via-transparent to-transparent" />
 
         {/* Title on image */}
         <div className="absolute bottom-5 left-6">
@@ -93,9 +96,7 @@ export default function RecipeCard({
 
       {/* Body */}
       <div className="p-6">
-        <p className="leading-7 text-[#8B5A3C]">
-          {summary}
-        </p>
+        <p className="leading-7 text-[#8B5A3C]">{summary}</p>
 
         <div className="mt-6 flex items-center justify-between">
           {/* Likes */}
@@ -105,15 +106,10 @@ export default function RecipeCard({
               onClick={handleLike}
               className="cursor-pointer text-[#C47A2C] transition hover:scale-110"
             >
-              <Heart
-                size={22}
-                fill={isLiked ? "currentColor" : "none"}
-              />
+              <Heart size={22} fill={isLiked ? "currentColor" : "none"} />
             </button>
 
-            <span className="font-medium text-[#C47A2C]">
-              {likeCount}
-            </span>
+            <span className="font-medium text-[#C47A2C]">{likeCount}</span>
           </div>
 
           {/* Saves */}
@@ -123,15 +119,10 @@ export default function RecipeCard({
               onClick={handleSave}
               className="cursor-pointer text-[#C47A2C] transition hover:scale-110"
             >
-              <Bookmark
-                size={22}
-                fill={isSaved ? "currentColor" : "none"}
-              />
+              <Bookmark size={22} fill={isSaved ? "currentColor" : "none"} />
             </button>
 
-            <span className="font-medium text-[#C47A2C]">
-              {saveCount}
-            </span>
+            <span className="font-medium text-[#C47A2C]">{saveCount}</span>
           </div>
 
           {/* Link text */}

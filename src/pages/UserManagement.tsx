@@ -1,12 +1,15 @@
+import { useEffect, useState } from "react";
 import AnimatedBackground from "../components/Layout/AnimatedBackground";
 import ProfileHeader from "../components/Profile/ProfileHeader";
 import ProfileStat from "../components/Profile/ProfileStats";
 import PostCard from "../components/Profile/ProfilePostCard";
 import { type Post } from "../core/interfaces/Post";
-import { Navigate } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 import { getCurrentUser } from "../utils/userStorage";
-
-import { useParams } from "react-router-dom";
+import {
+  getLikedRecipeIds,
+  getSavedRecipeIds,
+} from "../utils/recipeInteractions";
 
 const posts: Post[] = [
   {
@@ -27,24 +30,46 @@ const posts: Post[] = [
   },
 ];
 
-const stats = [
-  {
-    title: "Posts",
-    value: 12,
-  },
-  {
-    title: "Favorites",
-    value: 8,
-  },
-  {
-    title: "Saved Recipes",
-    value: 31,
-  },
-];
-
 export default function UserManagement() {
   const currentUser = getCurrentUser();
   const { username } = useParams();
+  const [likedCount, setLikedCount] = useState(getLikedRecipeIds().length);
+  const [savedCount, setSavedCount] = useState(getSavedRecipeIds().length);
+
+  useEffect(() => {
+    const syncCounts = () => {
+      setLikedCount(getLikedRecipeIds().length);
+      setSavedCount(getSavedRecipeIds().length);
+    };
+
+    syncCounts();
+    window.addEventListener("gusto-recipe-interactions-changed", syncCounts);
+
+    return () => {
+      window.removeEventListener(
+        "gusto-recipe-interactions-changed",
+        syncCounts,
+      );
+    };
+  }, []);
+
+  const stats = [
+    {
+      title: "Posts",
+      value: 12,
+      route: undefined,
+    },
+    {
+      title: "Favorites",
+      value: likedCount,
+      route: "/profile/favorites",
+    },
+    {
+      title: "Saved Recipes",
+      value: savedCount,
+      route: "/profile/saved",
+    },
+  ];
 
   if (!currentUser) {
     return <Navigate to="/login" replace />;
@@ -70,6 +95,7 @@ export default function UserManagement() {
               key={stat.title}
               title={stat.title}
               value={stat.value}
+              route={stat.route}
             />
           ))}
         </div>
