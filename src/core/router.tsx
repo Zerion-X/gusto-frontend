@@ -9,6 +9,8 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import UserManagement from "../pages/UserManagement";
 import MainLayout from "../components/Layout/MainLayout";
 import AuthLayout from "../components/Layout/AuthLayout";
+import RecipePage from "../pages/RecipePage";
+import RecipeCollectionPage from "../pages/RecipeCollectionPage";
 
 const router = createBrowserRouter([
   {
@@ -32,27 +34,21 @@ const router = createBrowserRouter([
             element: <MainLayout />,
             children: [
               { path: "home", element: <Home /> },
+              {
+                path: "profile/favorites",
+                element: <RecipeCollectionPage type="favorites" />,
+              },
+              {
+                path: "profile/saved",
+                element: <RecipeCollectionPage type="saved" />,
+              },
               { path: "profile/:username", element: <UserManagement /> },
-              // future pages
-              // { path: "recipes/:id", element: <Recipe /> },
+              { path: "recipes/:id", element: <RecipePage /> },
               // { path: "settings", element: <Settings /> },
             ],
           },
         ],
       },
-
-      // before
-      // {
-      //   element: <MainLayout />,
-      //   children: [
-      //     { path: "home", element: <Home /> },
-      //     { path: "profile/:username", element: <UserManagement /> },
-
-      //     // future pages
-      //     // { path: "recipes/:id", element: <Recipe /> },
-      //     // { path: "settings", element: <Settings /> },
-      //   ],
-      // },
     ],
   },
 ]);

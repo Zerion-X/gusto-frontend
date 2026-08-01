@@ -3,7 +3,6 @@ import { motion, useMotionValue, useTransform } from "framer-motion";
 import type { MouseEvent } from "react";
 import AnimatedBackground from "../components/Layout/AnimatedBackground";
 
-
 export default function Welcome() {
   const navigate = useNavigate();
 
@@ -13,9 +12,7 @@ export default function Welcome() {
   const rotateX = useTransform(mouseY, [-300, 300], [8, -8]);
   const rotateY = useTransform(mouseX, [-300, 300], [-8, 8]);
 
-  const handleMouseMove = (
-    e: MouseEvent<HTMLDivElement>
-  ) => {
+  const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
 
     mouseX.set(e.clientX - rect.left - rect.width / 2);
@@ -82,8 +79,8 @@ export default function Welcome() {
             delay: 0.7,
           }}
         >
-          A curated collection of recipes crafted for people who enjoy
-          cooking, exploring flavors, and creating memorable meals.
+          A curated collection of recipes crafted for people who enjoy cooking,
+          exploring flavors, and creating memorable meals.
         </motion.p>
 
         {/* Button */}
@@ -125,7 +122,7 @@ hover:shadow-[0_0_45px_rgba(229,155,30,0.45)]
         >
           <span className="relative z-10">Enter the Kitchen</span>
 
-          <div className="absolute inset-0 bg-gradient-to-r from-[#8B5A3C] to-[#9A5B2E]" />
+          <div className="absolute inset-0 bg-linear-to-r from-[#8B5A3C] to-[#9A5B2E]" />
 
           <div className="absolute -left-full top-0 h-full w-full bg-white/20 transition-all duration-700 group-hover:left-full" />
         </motion.button>
