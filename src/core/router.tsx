@@ -12,6 +12,7 @@ import MainLayout from "../components/Layout/MainLayout";
 import AuthLayout from "../components/Layout/AuthLayout";
 import RecipePage from "../pages/RecipePage";
 import RecipeCollectionPage from "../pages/RecipeCollectionPage";
+import AddPost from "../pages/Post";
 
 const router = createBrowserRouter([
   {
@@ -46,6 +47,7 @@ const router = createBrowserRouter([
               },
               { path: "profile/:username", element: <UserManagement /> },
               { path: "recipes/:id", element: <RecipePage /> },
+              { path: "createpost", element: <AddPost />}
               // { path: "settings", element: <Settings /> },
             ],
           },
