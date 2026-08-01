@@ -1,6 +1,5 @@
 import {
   Search,
-  SlidersHorizontal,
   Refrigerator,
   UserRound,
 } from "lucide-react";
@@ -21,6 +20,11 @@ export default function Navbar() {
     });
   };
 
+
+  const handleSearch = (recipe: string) => {
+    navigate(`/search?query=${recipe}`);
+  }
+
   return (
     <nav className="sticky top-0 z-50 border-b border-[#C47A2C]/10 bg-[#FFF8EA]/80 backdrop-blur-xl">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-8">
@@ -39,13 +43,24 @@ export default function Navbar() {
         </button>
 
         {/* Search */}
-        <div className="relative w-full max-w-xl mx-12">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const formData = new FormData(e.currentTarget);
+            const recipe = (formData.get("recipe") as string)?.trim() || "";
+            if (recipe) {
+              handleSearch(recipe);
+            }
+          }}
+          className="relative w-full max-w-xl mx-12"
+        >
           <Search
             size={18}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8B5A3C]/60"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8B5A3C]/90"
           />
 
           <input
+            name="recipe"
             type="text"
             placeholder="Search recipes..."
             className="
@@ -69,10 +84,12 @@ export default function Navbar() {
             "
           />
 
-          <button className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8B5A3C]/70 transition-colors hover:text-[#C47A2C]">
-            <SlidersHorizontal size={18} />
+          <button
+            type="submit"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8B5A3C]/70 transition-colors hover:text-[#C47A2C]"
+          >
           </button>
-        </div>
+        </form>
 
         {/* Right Icons */}
         <div className="flex items-center gap-3">
