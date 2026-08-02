@@ -5,26 +5,34 @@ import ProfileStat from "../components/Profile/ProfileStats";
 import PostCard from "../components/Profile/ProfilePostCard";
 import { Navigate, useParams } from "react-router-dom";
 import { getCurrentUser } from "../utils/userStorage";
-import {
-  getLikedRecipeIds,
-  getSavedRecipeIds,
-} from "../utils/recipeInteractions";
+import { getLikedItemIds, getSavedItemIds } from "../utils/recipeInteractions";
 import { getPostsByUser } from "../utils/postStorage";
+
+function getInteractionCounts() {
+  const likedCount =
+    getLikedItemIds("recipe").length + getLikedItemIds("post").length;
+  const savedCount =
+    getSavedItemIds("recipe").length + getSavedItemIds("post").length;
+
+  return { likedCount, savedCount };
+}
 
 export default function UserManagement() {
   const currentUser = getCurrentUser();
   const { username } = useParams();
 
-  const [likedCount, setLikedCount] = useState(getLikedRecipeIds().length);
-  const [savedCount, setSavedCount] = useState(getSavedRecipeIds().length);
+  const initialCounts = getInteractionCounts();
+  const [likedCount, setLikedCount] = useState(initialCounts.likedCount);
+  const [savedCount, setSavedCount] = useState(initialCounts.savedCount);
   const [userPosts, setUserPosts] = useState(() =>
     currentUser ? getPostsByUser(currentUser.username) : [],
   );
 
   useEffect(() => {
     const syncCounts = () => {
-      setLikedCount(getLikedRecipeIds().length);
-      setSavedCount(getSavedRecipeIds().length);
+      const counts = getInteractionCounts();
+      setLikedCount(counts.likedCount);
+      setSavedCount(counts.savedCount);
     };
 
     const refreshPosts = () => {
