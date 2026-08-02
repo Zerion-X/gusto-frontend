@@ -1,4 +1,4 @@
-import ImageUploadBox from "../components/AddImage";
+import ImageUploadBox from "../components/AddPost/AddImage";
 import { useState, type FormEvent } from "react";
 
 export default function AddPost() {
