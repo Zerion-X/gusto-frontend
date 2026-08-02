@@ -1,4 +1,5 @@
 import { getCurrentUser } from "./userStorage";
+import { removeItemInteractions } from "./recipeInteractions";
 
 export interface RecipePost {
   id: number;
@@ -162,6 +163,7 @@ export function deletePost(postId: number): boolean {
   }
 
   savePosts(filtered);
+  removeItemInteractions("post", postId);
   window.dispatchEvent(new Event("gusto-posts-changed"));
   return true;
 }

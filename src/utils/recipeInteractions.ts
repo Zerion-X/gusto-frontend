@@ -155,6 +155,32 @@ export function toggleItemSave(target: InteractionTarget, itemId: number) {
   return !isSaved;
 }
 
+export function removeItemInteractions(target: InteractionTarget, itemId: number) {
+  const interactions = readInteractions();
+  const itemKey = getItemKey(target, itemId);
+
+  const likedCountBefore = interactions.likedItemKeys.length;
+  const savedCountBefore = interactions.savedItemKeys.length;
+
+  interactions.likedItemKeys = interactions.likedItemKeys.filter(
+    (key) => key !== itemKey,
+  );
+  interactions.savedItemKeys = interactions.savedItemKeys.filter(
+    (key) => key !== itemKey,
+  );
+
+  if (
+    interactions.likedItemKeys.length !== likedCountBefore ||
+    interactions.savedItemKeys.length !== savedCountBefore
+  ) {
+    writeInteractions(interactions);
+
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("gusto-recipe-interactions-changed"));
+    }
+  }
+}
+
 export function toggleRecipeLike(recipeId: number) {
   return toggleItemLike("recipe", recipeId);
 }
