@@ -1,4 +1,4 @@
-import ImageUploadBox from "../components/AddImage";
+import ImageUploadBox from "../components/AddPost/AddImage";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { addPost, updatePost } from "../utils/postStorage";

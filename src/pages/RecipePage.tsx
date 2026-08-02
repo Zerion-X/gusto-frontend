@@ -10,10 +10,9 @@ export default function RecipePage() {
   const location = useLocation();
   const isPostView =
     new URLSearchParams(location.search).get("type") === "post";
-  const recipe = !isPostView ? getRecipeById(id) : undefined;
+  const recipe = getRecipeById(id);
   const post = getPostById(id);
-
-  const item = recipe ?? post;
+  const item = isPostView ? post : recipe ?? post;
 
   if (!item) {
     return (
@@ -34,6 +33,12 @@ export default function RecipePage() {
       </div>
     );
   }
+
+  const isRecipe = "difficulty" in item;
+  const badgeText = isRecipe
+    ? `${item.difficulty} • ${item.time}`
+    : "Community Post";
+  const createdText = "createdAt" in item ? item.createdAt : undefined;
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#FFF8EA]">
@@ -60,9 +65,7 @@ export default function RecipePage() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
               <div className="absolute bottom-6 left-6 right-6">
                 <p className="mb-2 inline-block rounded-full bg-white/20 px-3 py-1 text-sm text-white backdrop-blur">
-                  {"difficulty" in item
-                    ? `${item.difficulty} • ${item.time}`
-                    : "Community Recipe"}
+                  {badgeText}
                 </p>
                 <h1
                   className="text-4xl text-white drop-shadow-lg sm:text-5xl"
@@ -93,36 +96,15 @@ export default function RecipePage() {
                     {"author" in item ? item.author : "Gusto Kitchen"}
                   </span>
                 </div>
-                <div className="flex items-center gap-2 rounded-full bg-[#FFF3E3] px-4 py-2 text-[#C47A2C]">
-                  <Clock3 size={18} />
-                  <span>
-                    {"time" in item ? `${item.time}` : "Community Recipe"}
-                  </span>
-                </div>
+                {createdText ? (
+                  <div className="flex items-center gap-2 rounded-full bg-[#FFF3E3] px-4 py-2 text-[#C47A2C]">
+                    <Clock3 size={18} />
+                    <span>{createdText}</span>
+                  </div>
+                ) : null}
               </div>
 
               <div className="mt-8 grid gap-8 md:grid-cols-2">
-                <div>
-                  <h2 className="mb-3 text-2xl text-[#3A2419]">Ingredients</h2>
-                  <ul className="space-y-2 text-[#8B5A3C]">
-                    {"ingredients" in item ? (
-                      <ul>
-                        {item.ingredients.map((ingredient) => (
-                          <li
-                            key={ingredient}
-                            className="flex items-start gap-2"
-                          >
-                            <span className="mt-2 h-2 w-2 rounded-full bg-[#C47A2C]" />
-                            <span>{ingredient}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-[#8B5A3C]">No ingredients provided.</p>
-                    )}
-                  </ul>
-                </div>
-
                 <div>
                   <h2 className="mb-3 text-2xl text-[#3A2419]">Steps</h2>
                   <ol className="space-y-3 text-[#8B5A3C]">
