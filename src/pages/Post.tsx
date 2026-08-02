@@ -1,30 +1,49 @@
 import ImageUploadBox from "../components/AddImage";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { addPost } from "../utils/postStorage";
+import { addPost, updatePost } from "../utils/postStorage";
 
-export default function AddPost() {
+interface editProps {
+  type?: string;
+  editImg?: string;
+  editTitle?: string;
+  editDes?: string;
+  editsteps?: string[];
+  editID?: number;
+}
+
+export default function AddPost({
+  type,
+  editImg,
+  editTitle,
+  editDes,
+  editsteps,
+  editID,
+}: editProps) {
   const navigate = useNavigate();
-  const [image, setImage] = useState("");
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [stepCount, setStepCount] = useState(1);
+  const [image, setImage] = useState(editImg ?? "");
+  const [title, setTitle] = useState(editTitle ?? "");
+  const [description, setDescription] = useState(editDes ?? "");
+  const [stepCount, setStepCount] = useState(type === "edit" ? (editsteps?.length ?? 1) : 1);
   const [steps, setSteps] = useState<string[]>([""]);
+  const [editSteps, setEditSteps] = useState<string[]>(editsteps?.length ? editsteps : [""]);
   const [statusMessage, setStatusMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const activeSteps = type === "edit" ? editSteps : steps;
+  const setActiveSteps = type === "edit" ? setEditSteps : setSteps;
+
   const handleStepChange = (index: number, value: string) => {
-    const updatedSteps = [...steps];
-    updatedSteps[index] = value;
-    setSteps(updatedSteps);
+    const updated = [...activeSteps];
+    updated[index] = value;
+    setActiveSteps(updated);
   };
 
   const handleStepCountChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const count = Number(e.target.value);
-
     setStepCount(count);
 
-    setSteps((prev) => {
+    setActiveSteps((prev) => {
       const updated = [...prev];
       if (count > updated.length) {
         while (updated.length < count) {
@@ -42,6 +61,7 @@ export default function AddPost() {
     setDescription("");
     setStepCount(1);
     setSteps([""]);
+    setEditSteps([""]);
     setImage("");
   };
 
@@ -51,7 +71,7 @@ export default function AddPost() {
     if (
       !title.trim() ||
       !description.trim() ||
-      steps.some((step) => !step.trim()) ||
+      activeSteps.some((step) => !step.trim()) ||
       !image
     ) {
       setStatusMessage("Please complete all recipe steps and add an image.");
@@ -61,22 +81,42 @@ export default function AddPost() {
     setIsSubmitting(true);
     setStatusMessage("");
 
-    const createdPost = addPost({
-      title: title.trim(),
-      description: description.trim(),
-      steps: steps.map((step) => step.trim()),
-      image,
-    });
+    try {
+      let postStatus;
+      if (type === "edit" && editID !== undefined){
+        postStatus = updatePost(editID, {
+          title: title.trim(),
+          description: description.trim(),
+          steps: activeSteps.map((step) => step.trim()).filter(Boolean),
+          image: image || editImg || "",
+        });
 
-    if (createdPost) {
-      resetForm();
-      setStatusMessage("Post published successfully!");
-      navigate(`/recipes/${createdPost.id}?type=post`);
-    } else {
-      setStatusMessage("Please sign in before publishing a post.");
+      } else {
+        postStatus = addPost({
+          title: title.trim(),
+          description: description.trim(),
+          steps: activeSteps.map((step) => step.trim()),
+          image,
+        });
+      }
+
+      if (postStatus) {
+        resetForm();
+        setStatusMessage("Post published successfully!");
+        navigate(`/recipes/${postStatus.id}?type=post`);
+      } else {
+        setStatusMessage("Please sign in before publishing a post.");
+      }
+    } catch (error) {
+      console.error(error);
+      setStatusMessage(
+        error instanceof Error
+          ? error.message
+          : "Could not publish post. The image may be too large.",
+      );
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setIsSubmitting(false);
   };
 
   return (
@@ -86,7 +126,7 @@ export default function AddPost() {
           <div className="rounded-[30px] border border-[#C47A2C]/15 bg-[#FFF8EA]/70 p-4 sm:p-6">
             <div className="mb-5">
               <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#8B5A3C]/70">
-                Create Post
+                {type === "edit" ? "Edit Post" : "Create Post"}
               </p>
               <h2 className="mt-2 text-3xl font-semibold text-[#3A2419] sm:text-4xl">
                 Share your next favorite recipe
@@ -97,7 +137,12 @@ export default function AddPost() {
               </p>
             </div>
 
-            <ImageUploadBox image={image} onImageSelect={setImage} />
+            <ImageUploadBox
+              image={image}
+              onImageSelect={setImage}
+              editImg={editImg}
+              type={type}
+            />
           </div>
 
           <div className="flex flex-col justify-center rounded-[30px] border border-[#C47A2C]/15 bg-white/70 p-6 shadow-sm sm:p-8">
@@ -150,20 +195,17 @@ export default function AddPost() {
                 </select>
 
                 <div className="space-y-4">
-                  {steps.map((step, index) => (
+                  {activeSteps.map((_ , index) => (
                     <div key={index}>
                       <label className="mb-2 block text-sm font-medium text-[#8B5A3C]">
                         Step {index + 1}
                       </label>
 
                       <textarea
-                        value={step}
-                        onChange={(e) =>
-                          handleStepChange(index, e.target.value)
-                        }
+                        value={activeSteps[index] ?? ""}
+                        onChange={(e) => handleStepChange(index, e.target.value)}
                         rows={3}
-                        placeholder={`Describe step ${index + 1}...`}
-                        required
+                        placeholder={`Write step ${index + 1}...`}
                         className="w-full resize-none rounded-[20px] border border-[#C47A2C]/20 bg-white/60 px-4 py-3 text-[#3A2419] placeholder:text-[#8B5A3C]/50 outline-none transition-all duration-300 focus:border-[#C47A2C] focus:ring-4 focus:ring-[#E59B1E]/20"
                       />
                     </div>
@@ -180,7 +222,13 @@ export default function AddPost() {
                 disabled={isSubmitting}
                 className="w-full rounded-full bg-[#C47A2C] px-6 py-3 font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#8B5A3C] disabled:cursor-not-allowed disabled:opacity-70"
               >
-                {isSubmitting ? "Publishing..." : "Publish Post"}
+                {isSubmitting
+                  ? type === "edit"
+                    ? "Editing..."
+                    : "Publishing..."
+                  : type === "edit"
+                    ? "Save Changes"
+                    : "Publish Post"}
               </button>
             </div>
           </div>

@@ -14,9 +14,12 @@ import { getPostsByUser } from "../utils/postStorage";
 export default function UserManagement() {
   const currentUser = getCurrentUser();
   const { username } = useParams();
+
   const [likedCount, setLikedCount] = useState(getLikedRecipeIds().length);
   const [savedCount, setSavedCount] = useState(getSavedRecipeIds().length);
-  const userPosts = currentUser ? getPostsByUser(currentUser.username) : [];
+  const [userPosts, setUserPosts] = useState(() =>
+    currentUser ? getPostsByUser(currentUser.username) : [],
+  );
 
   useEffect(() => {
     const syncCounts = () => {
@@ -24,16 +27,29 @@ export default function UserManagement() {
       setSavedCount(getSavedRecipeIds().length);
     };
 
+    const refreshPosts = () => {
+      if (!currentUser) {
+        setUserPosts([]);
+        return;
+      }
+
+      setUserPosts(getPostsByUser(currentUser.username));
+    };
+
     syncCounts();
+    refreshPosts();
+
     window.addEventListener("gusto-recipe-interactions-changed", syncCounts);
+    window.addEventListener("gusto-posts-changed", refreshPosts);
 
     return () => {
       window.removeEventListener(
         "gusto-recipe-interactions-changed",
         syncCounts,
       );
+      window.removeEventListener("gusto-posts-changed", refreshPosts);
     };
-  }, []);
+  }, [currentUser?.username]);
 
   const stats = [
     {
@@ -105,6 +121,7 @@ export default function UserManagement() {
                   description={post.description}
                   likes={post.likes}
                   createdAt={post.createdAt}
+                  id={post.id}
                 />
               ))
             )}

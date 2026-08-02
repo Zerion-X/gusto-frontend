@@ -61,7 +61,15 @@ export function getPosts(): RecipePost[] {
 }
 
 function savePosts(posts: RecipePost[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
+  } catch (error) {
+    console.error("Failed to save posts:", error);
+    throw new Error(
+      "Could not save the post. The omage may be too large for localStorage."
+    );
+  }
+ 
 }
 
 export function addPost(
@@ -124,4 +132,36 @@ export function updatePostInteraction(
 
 export function getPostsByUser(username: string) {
   return getPosts().filter((post) => post.author === username);
+}
+
+export function updatePost(
+  postId: number,
+  updatedFields: Partial<Omit<RecipePost, "id" | "author" | "createdAt" | "likes" | "saves">>,
+): RecipePost | undefined {
+  const posts = getPosts();
+  const targetIndex = posts.findIndex((post) => post.id === postId);
+  if (targetIndex === -1) {
+    return undefined;
+  }
+  const updatedPost = {
+    ...posts[targetIndex],
+    ...updatedFields,
+  } as RecipePost;
+  posts[targetIndex] = updatedPost;
+  savePosts(posts);
+  window.dispatchEvent(new Event("gusto-posts-changed"));
+  return updatedPost;
+}
+
+export function deletePost(postId: number): boolean {
+  const posts = getPosts();
+  const filtered = posts.filter((post) => post.id !== postId);
+
+  if (filtered.length === posts.length) {
+    return false;
+  }
+
+  savePosts(filtered);
+  window.dispatchEvent(new Event("gusto-posts-changed"));
+  return true;
 }
