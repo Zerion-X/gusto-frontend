@@ -3,60 +3,66 @@ import AnimatedBackground from "../components/Layout/AnimatedBackground";
 import ProfileHeader from "../components/Profile/ProfileHeader";
 import ProfileStat from "../components/Profile/ProfileStats";
 import PostCard from "../components/Profile/ProfilePostCard";
-import { type Post } from "../core/interfaces/Post";
 import { Navigate, useParams } from "react-router-dom";
 import { getCurrentUser } from "../utils/userStorage";
-import {
-  getLikedRecipeIds,
-  getSavedRecipeIds,
-} from "../utils/recipeInteractions";
+import { getLikedItemIds, getSavedItemIds } from "../utils/recipeInteractions";
+import { getPostsByUser } from "../utils/postStorage";
 
-const posts: Post[] = [
-  {
-    id: 1,
-    title: "Homemade Burger",
-    description: "Best burger I've ever made.",
-    likes: 42,
-    comments: 12,
-    createdAt: "2 days ago",
-  },
-  {
-    id: 2,
-    title: "Italian Pizza",
-    description: "Fresh mozzarella and basil.",
-    likes: 80,
-    comments: 25,
-    createdAt: "1 week ago",
-  },
-];
+function getInteractionCounts() {
+  const likedCount =
+    getLikedItemIds("recipe").length + getLikedItemIds("post").length;
+  const savedCount =
+    getSavedItemIds("recipe").length + getSavedItemIds("post").length;
+
+  return { likedCount, savedCount };
+}
 
 export default function UserManagement() {
   const currentUser = getCurrentUser();
   const { username } = useParams();
-  const [likedCount, setLikedCount] = useState(getLikedRecipeIds().length);
-  const [savedCount, setSavedCount] = useState(getSavedRecipeIds().length);
+
+  const initialCounts = getInteractionCounts();
+  const [likedCount, setLikedCount] = useState(initialCounts.likedCount);
+  const [savedCount, setSavedCount] = useState(initialCounts.savedCount);
+  const [userPosts, setUserPosts] = useState(() =>
+    currentUser ? getPostsByUser(currentUser.username) : [],
+  );
 
   useEffect(() => {
     const syncCounts = () => {
-      setLikedCount(getLikedRecipeIds().length);
-      setSavedCount(getSavedRecipeIds().length);
+      const counts = getInteractionCounts();
+      setLikedCount(counts.likedCount);
+      setSavedCount(counts.savedCount);
+    };
+
+    const refreshPosts = () => {
+      if (!currentUser) {
+        setUserPosts([]);
+        return;
+      }
+
+      setUserPosts(getPostsByUser(currentUser.username));
     };
 
     syncCounts();
+    refreshPosts();
+
     window.addEventListener("gusto-recipe-interactions-changed", syncCounts);
+    window.addEventListener("gusto-posts-changed", refreshPosts);
 
     return () => {
       window.removeEventListener(
         "gusto-recipe-interactions-changed",
         syncCounts,
       );
+      window.removeEventListener("gusto-posts-changed", refreshPosts);
     };
-  }, []);
+  }, [currentUser?.username]);
 
   const stats = [
     {
       title: "Posts",
-      value: 12,
+      value: userPosts.length,
       route: undefined,
     },
     {
@@ -111,9 +117,22 @@ export default function UserManagement() {
           </h2>
 
           <div className="space-y-6">
-            {posts.map((post) => (
-              <PostCard key={post.id} {...post} />
-            ))}
+            {userPosts.length === 0 ? (
+              <div className="rounded-3xl border border-white/40 bg-white/30 p-6 text-[#8B5A3C] shadow-xl backdrop-blur-xl">
+                You have not posted anything yet.
+              </div>
+            ) : (
+              userPosts.map((post) => (
+                <PostCard
+                  key={post.id}
+                  title={post.title}
+                  description={post.description}
+                  likes={post.likes}
+                  createdAt={post.createdAt}
+                  id={post.id}
+                />
+              ))
+            )}
           </div>
         </section>
       </section>

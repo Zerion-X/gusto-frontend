@@ -1,7 +1,19 @@
 import { useRef, useState } from "react";
 import { ImagePlus } from "lucide-react";
 
-export default function ImageUploadBox({ onImageSelect }: { onImageSelect: (file: File) => void }) {
+type ImageUploadBoxProps = {
+  image: string;
+  onImageSelect: (image: string) => void;
+  editImg?: string;
+  type?: string;
+};
+
+export default function ImageUploadBox({
+  image,
+  onImageSelect,
+  editImg,
+  type,
+}: ImageUploadBoxProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
 

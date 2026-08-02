@@ -1,7 +1,8 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import AnimatedBackground from "../components/Layout/AnimatedBackground";
-import RecipeCard, { type RecipeCardProps } from "../components/Recipe/RecipeCard";
+import RecipeCard from "../components/Recipe/RecipeCard";
+import { getPosts } from "../utils/postStorage";
 import img1 from "../assets/images (3).jpg";
 import img2 from "../assets/images (1).jpg";
 import img3 from "../assets/images (2).jpg";
@@ -9,7 +10,7 @@ import img4 from "../assets/images (4).jpg";
 import img5 from "../assets/images (5).jpg";
 import img6 from "../assets/images.jpg";
 
-const recipes: RecipeCardProps[] = [
+const recipes = [
   {
     id: 1,
     image: img1,
@@ -63,31 +64,48 @@ const recipes: RecipeCardProps[] = [
 export default function SearchResults() {
   const [searchParams] = useSearchParams();
   const query = searchParams.get("query")?.trim() ?? "";
+  const [posts, setPosts] = useState(() => getPosts());
 
-  const filteredRecipes = useMemo(
-    () =>
-      query
-        ? recipes.filter((recipe) =>
-            [recipe.name]
-              .join(" ")
-              .toLowerCase()
-              .includes(query.toLowerCase()),
-          )
-        : [],
-    [query],
+  useEffect(() => {
+    const refresh = () => setPosts(getPosts());
+    window.addEventListener("gusto-posts-changed", refresh);
+    return () => window.removeEventListener("gusto-posts-changed", refresh);
+  }, []);
+
+  const allItems = useMemo(
+    () => [
+      ...recipes.map((recipe) => ({ ...recipe, kind: "recipe" as const })),
+      ...posts.map((post) => ({
+        id: post.id,
+        image: post.image,
+        name: post.title,
+        summary: post.description,
+        likes: post.likes,
+        saves: post.saves,
+        kind: "post" as const,
+      })),
+    ],
+    [posts],
   );
+
+  const filteredRecipes = useMemo(() => {
+    if (!query) return [];
+
+    return allItems.filter((item) =>
+      [item.name].join(" ").toLowerCase().includes(query.toLowerCase()),
+    );
+  }, [allItems, query]);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#FFF8EA]">
       <AnimatedBackground />
 
       <main className="relative z-10 mx-auto max-w-7xl px-8 py-12">
-
         {query ? (
           filteredRecipes.length > 0 ? (
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
               {filteredRecipes.map((recipe) => (
-                <RecipeCard key={recipe.id} {...recipe} />
+                <RecipeCard key={`${recipe.kind}-${recipe.id}`} {...recipe} />
               ))}
             </div>
           ) : (
@@ -96,7 +114,8 @@ export default function SearchResults() {
                 No recipes found
               </p>
               <p className="mt-3 text-[#6D4C41]/90">
-                Try a different keyword or broaden your search to find recipes that match.
+                Try a different keyword or broaden your search to find recipes
+                that match.
               </p>
             </div>
           )
@@ -106,7 +125,8 @@ export default function SearchResults() {
               Ready to search?
             </p>
             <p className="mt-3 text-[#6D4C41]/90">
-              Use the search bar above to explore recipes, ingredients, and cuisine ideas.
+              Use the search bar above to explore recipes, ingredients, and
+              cuisine ideas.
             </p>
           </div>
         )}

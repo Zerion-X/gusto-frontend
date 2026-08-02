@@ -3,11 +3,9 @@ import { ArrowLeft } from "lucide-react";
 import AnimatedBackground from "../components/Layout/AnimatedBackground";
 import RecipeCard from "../components/Recipe/RecipeCard";
 import { recipes } from "../data/recipes";
-import {
-  getLikedRecipeIds,
-  getSavedRecipeIds,
-} from "../utils/recipeInteractions";
+import { getLikedItemIds, getSavedItemIds } from "../utils/recipeInteractions";
 import { getCurrentUser } from "../utils/userStorage";
+import { getPosts } from "../utils/postStorage";
 
 type RecipeCollectionPageProps = {
   type: "favorites" | "saved";
@@ -18,19 +16,27 @@ export default function RecipeCollectionPage({
 }: RecipeCollectionPageProps) {
   const navigate = useNavigate();
   const currentUser = getCurrentUser();
-  const likedRecipeIds = getLikedRecipeIds();
-  const savedRecipeIds = getSavedRecipeIds();
-
   const isFavorites = type === "favorites";
+
+  const likedRecipeIds = getLikedItemIds("recipe");
+  const savedRecipeIds = getSavedItemIds("recipe");
+  const likedPostIds = getLikedItemIds("post");
+  const savedPostIds = getSavedItemIds("post");
+
   const recipeIds = isFavorites ? likedRecipeIds : savedRecipeIds;
-  const heading = isFavorites ? "Favorite Recipes" : "Saved Recipes";
+  const postIds = isFavorites ? likedPostIds : savedPostIds;
+  const heading = isFavorites
+    ? "Favorite Recipes & Posts"
+    : "Saved Recipes & Posts";
   const emptyMessage = isFavorites
-    ? "You have not liked any recipes yet."
-    : "You have not saved any recipes yet.";
+    ? "You have not liked any recipes or posts yet."
+    : "You have not saved any recipes or posts yet.";
 
   const visibleRecipes = recipes.filter((recipe) =>
     recipeIds.includes(recipe.id),
   );
+  const visiblePosts = getPosts().filter((post) => postIds.includes(post.id));
+  const visibleItems = [...visibleRecipes, ...visiblePosts];
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#FFF8EA]">
@@ -55,14 +61,30 @@ export default function RecipeCollectionPage({
           {heading}
         </h1>
 
-        {visibleRecipes.length === 0 ? (
+        {visibleItems.length === 0 ? (
           <div className="rounded-[28px] border border-white/40 bg-white/50 p-10 text-center shadow-2xl backdrop-blur-xl">
             <p className="text-lg text-[#8B5A3C]">{emptyMessage}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
             {visibleRecipes.map((recipe) => (
-              <RecipeCard key={recipe.id} {...recipe} />
+              <RecipeCard
+                key={`recipe-${recipe.id}`}
+                {...recipe}
+                kind="recipe"
+              />
+            ))}
+            {visiblePosts.map((post) => (
+              <RecipeCard
+                key={`post-${post.id}`}
+                id={post.id}
+                image={post.image}
+                name={post.title}
+                summary={post.description}
+                likes={post.likes}
+                saves={post.saves}
+                kind="post"
+              />
             ))}
           </div>
         )}

@@ -3,19 +3,21 @@ import { motion } from "framer-motion";
 import { Heart, Bookmark } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
-  isRecipeLiked,
-  isRecipeSaved,
-  toggleRecipeLike,
-  toggleRecipeSave,
+  isItemLiked,
+  isItemSaved,
+  toggleItemLike,
+  toggleItemSave,
 } from "../../utils/recipeInteractions";
+import { updatePostInteraction } from "../../utils/postStorage";
 
 export type RecipeCardProps = {
   id: number;
   image: string;
   name: string;
   summary: string;
-  likes: number;
-  saves: number;
+  likes?: number;
+  saves?: number;
+  kind?: "recipe" | "post";
 };
 
 export default function RecipeCard({
@@ -23,8 +25,9 @@ export default function RecipeCard({
   image,
   name,
   summary,
-  likes,
-  saves,
+  likes = 0,
+  saves = 0,
+  kind = "recipe",
 }: RecipeCardProps) {
   const navigate = useNavigate();
 
@@ -35,25 +38,36 @@ export default function RecipeCard({
   const [likeCount, setLikeCount] = useState(likes);
 
   useEffect(() => {
-    setIsLiked(isRecipeLiked(id));
-    setIsSaved(isRecipeSaved(id));
-  }, [id]);
+    setIsLiked(isItemLiked(kind, id));
+    setIsSaved(isItemSaved(kind, id));
+  }, [id, kind]);
 
   function handleSave(e: React.MouseEvent) {
     e.stopPropagation();
 
-    const nextSaved = toggleRecipeSave(id);
+    const nextSaved = toggleItemSave(kind, id);
     setIsSaved(nextSaved);
     setSaveCount((count) => (nextSaved ? count + 1 : count - 1));
+
+    if (kind === "post") {
+      updatePostInteraction(id, "saves", nextSaved ? 1 : -1);
+    }
   }
 
   function handleLike(e: React.MouseEvent) {
     e.stopPropagation();
 
-    const nextLiked = toggleRecipeLike(id);
+    const nextLiked = toggleItemLike(kind, id);
     setIsLiked(nextLiked);
     setLikeCount((count) => (nextLiked ? count + 1 : count - 1));
+
+    if (kind === "post") {
+      updatePostInteraction(id, "likes", nextLiked ? 1 : -1);
+    }
   }
+
+  const targetPath =
+    kind === "post" ? `/recipes/${id}?type=post` : `/recipes/${id}`;
 
   return (
     <motion.article
@@ -61,7 +75,7 @@ export default function RecipeCard({
         y: -10,
       }}
       transition={{ duration: 0.25 }}
-      onClick={() => navigate(`/recipes/${id}`)}
+      onClick={() => navigate(targetPath)}
       className="group cursor-pointer overflow-hidden rounded-[28px] border border-white/40 bg-white/30 shadow-2xl backdrop-blur-xl"
     >
       {/* Image */}
