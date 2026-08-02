@@ -1,8 +1,7 @@
-import ImageUploadBox from "../components/AddImage";
+import ImageUploadBox from "../components/AddPost/AddImage";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { addPost, updatePost } from "../utils/postStorage";
->>>>>>> 59c639b67c101536b0ef482c08b829fbac1fca32
 
 interface editProps {
   type?: string;
