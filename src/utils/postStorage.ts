@@ -1,17 +1,7 @@
 import { getCurrentUser } from "./userStorage";
 import { removeItemInteractions } from "./recipeInteractions";
+import type RecipePost  from "../core/interfaces/IPosts"
 
-export interface RecipePost {
-  id: number;
-  author: string;
-  title: string;
-  description: string;
-  steps: string[];
-  image: string;
-  createdAt: string;
-  likes: number;
-  saves: number;
-}
 
 const STORAGE_KEY = "gusto-posts";
 const NEXT_ID_KEY = "gusto-next-post-id";

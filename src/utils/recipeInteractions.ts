@@ -1,4 +1,5 @@
 import { getCurrentUser } from "./userStorage";
+import type RecipePost from "../core/interfaces/IPosts";
 
 const STORAGE_KEY = "gusto-recipe-interactions";
 
@@ -187,4 +188,19 @@ export function toggleRecipeLike(recipeId: number) {
 
 export function toggleRecipeSave(recipeId: number) {
   return toggleItemSave("recipe", recipeId);
+}
+
+export function normalizePostForRecipePage(post : RecipePost) {
+  return {
+    id: post.id,
+    name: post.title,
+    summary: post.description,
+    steps: post.steps,
+    image: post.image,
+    likes: post.likes,
+    saves: post.saves,
+    author: post.author,
+    createdAt: post.createdAt,
+    kind: "post",
+  };
 }

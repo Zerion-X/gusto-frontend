@@ -3,7 +3,7 @@ import AnimatedBackground from "../components/Layout/AnimatedBackground";
 import ProfileHeader from "../components/Profile/ProfileHeader";
 import ProfileStat from "../components/Profile/ProfileStats";
 import PostCard from "../components/Profile/ProfilePostCard";
-import { Navigate, useParams } from "react-router-dom";
+import { Navigate, useParams, useNavigate } from "react-router-dom";
 import { getCurrentUser } from "../utils/userStorage";
 import { getLikedItemIds, getSavedItemIds } from "../utils/recipeInteractions";
 import { getPostsByUser } from "../utils/postStorage";
@@ -20,6 +20,7 @@ function getInteractionCounts() {
 export default function UserManagement() {
   const currentUser = getCurrentUser();
   const { username } = useParams();
+  const navigate = useNavigate();
 
   const initialCounts = getInteractionCounts();
   const [likedCount, setLikedCount] = useState(initialCounts.likedCount);
@@ -94,7 +95,7 @@ export default function UserManagement() {
           username={currentUser.username}
           email={currentUser.email}
         />
-
+        
         <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
           {stats.map((stat) => (
             <ProfileStat
@@ -134,6 +135,14 @@ export default function UserManagement() {
               ))
             )}
           </div>
+          <div className="mt-10 flex justify-center">
+          <button type="button" 
+          onClick={() => navigate("/welcome") }
+          className="w-38 rounded-full bg-[#C47A2C] px-6 py-3 font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#8B5A3C] disabled:cursor-not-allowed disabled:opacity-70" 
+          >    
+            Logout
+          </button>
+        </div>
         </section>
       </section>
     </main>
