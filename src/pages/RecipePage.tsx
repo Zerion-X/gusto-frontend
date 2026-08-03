@@ -104,7 +104,7 @@ export default function RecipePage() {
                 ) : null}
               </div>
 
-              <div className="mt-8 grid gap-8 md:grid-cols-2">
+              <div className="mt-8 grid gap-8 md:grid-cols-2 min-h-[50vh]">
                 <div>
                   <h2 className="mb-3 text-2xl text-[#3A2419]">Steps</h2>
                   <ol className="space-y-3 text-[#8B5A3C]">

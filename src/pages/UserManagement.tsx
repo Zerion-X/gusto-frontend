@@ -7,6 +7,7 @@ import { Navigate, useParams, useNavigate } from "react-router-dom";
 import { getCurrentUser } from "../utils/userStorage";
 import { getLikedItemIds, getSavedItemIds } from "../utils/recipeInteractions";
 import { getPostsByUser } from "../utils/postStorage";
+import { logoutUser } from "../utils/userStorage"; 
 
 function getInteractionCounts() {
   const likedCount =
@@ -28,6 +29,11 @@ export default function UserManagement() {
   const [userPosts, setUserPosts] = useState(() =>
     currentUser ? getPostsByUser(currentUser.username) : [],
   );
+
+  const handlelogout = () => {
+    logoutUser();
+    navigate("/welcome");
+  }
 
   useEffect(() => {
     const syncCounts = () => {
@@ -137,7 +143,7 @@ export default function UserManagement() {
           </div>
           <div className="mt-10 flex justify-center">
           <button type="button" 
-          onClick={() => navigate("/welcome") }
+          onClick={handlelogout}
           className="w-38 rounded-full bg-[#C47A2C] px-6 py-3 font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#8B5A3C] disabled:cursor-not-allowed disabled:opacity-70" 
           >    
             Logout
