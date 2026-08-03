@@ -2,6 +2,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft, Clock3, ChefHat, Heart, Bookmark } from "lucide-react";
 import { getRecipeById } from "../data/recipes";
 import { getPostById } from "../utils/postStorage";
+import { normalizePostForRecipePage } from "../utils/recipeInteractions";
 import AnimatedBackground from "../components/Layout/AnimatedBackground";
 
 export default function RecipePage() {
@@ -12,7 +13,8 @@ export default function RecipePage() {
     new URLSearchParams(location.search).get("type") === "post";
   const recipe = getRecipeById(id);
   const post = getPostById(id);
-  const item = isPostView ? post : recipe ?? post;
+  const normalizedPost = post ? normalizePostForRecipePage(post) : undefined;
+  const item = isPostView ? normalizedPost : recipe ?? normalizedPost;
 
   if (!item) {
     return (
@@ -35,9 +37,7 @@ export default function RecipePage() {
   }
 
   const isRecipe = "difficulty" in item;
-  const badgeText = isRecipe
-    ? `${item.difficulty} • ${item.time}`
-    : "Community Post";
+  const badgeText = isRecipe ? `${item.difficulty} • ${item.time}` : "Community Post";
   const createdText = "createdAt" in item ? item.createdAt : undefined;
 
   return (
@@ -59,7 +59,7 @@ export default function RecipePage() {
             <div className="relative h-80 lg:h-full">
               <img
                 src={item.image}
-                alt={"name" in item ? item.name : item.title}
+                alt={item.name}
                 className="h-full w-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
@@ -71,14 +71,14 @@ export default function RecipePage() {
                   className="text-4xl text-white drop-shadow-lg sm:text-5xl"
                   style={{ fontFamily: "Cormorant Garamond, serif" }}
                 >
-                  {"name" in item ? item.name : item.title}
+                  {item.name}
                 </h1>
               </div>
             </div>
 
             <div className="p-8 lg:p-10">
               <p className="text-lg leading-8 text-[#8B5A3C]">
-                {item.description}
+                {item.summary}
               </p>
 
               <div className="mt-6 flex flex-wrap gap-4">
@@ -93,7 +93,7 @@ export default function RecipePage() {
                 <div className="flex items-center gap-2 rounded-full bg-[#FFF3E3] px-4 py-2 text-[#C47A2C]">
                   <ChefHat size={18} />
                   <span>
-                    {"author" in item ? item.author : "Gusto Kitchen"}
+                    {item.author}
                   </span>
                 </div>
                 {createdText ? (
